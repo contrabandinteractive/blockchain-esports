@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+<component name="RowListContentTask" extends="Task">
+
+    <interface>
+        <field id="content" type="node" />
+    </interface>
+
+	<script type= "text/brightscript" uri = "pkg:/components/Config.brs"/>
+    <script type="text/brightscript">
+
+        <![CDATA[
+			Sub Init()
+			    m.top.functionName = "loadContent"
+			End Sub
+
+			Sub loadContent()
+        m.array = []
+        'm.global.thetastreams = loadTheArray()
+
+        m.xfer = CreateObject("roURLTransfer")
+        m.xfer.SetCertificatesFile("common:/certs/ca-bundle.crt")
+        m.xfer.SetURL("https://api.theta.tv/v1/theta/channel/list?number=")
+        m.rsp = m.xfer.GetToString()
+
+        response = ParseJson(m.rsp)
+        For Each thetaStream In response.body
+            print thetaStream.live_stream.title
+            xStreamTitle = thetaStream.live_stream.title
+            xStreamFormat = "hls"
+            xStreamLogo = thetaStream.live_stream.thumbnail_url
+            'xStreamURL = thetaStream.live_stream.video_url_map."2d".master
+            xStreamURL = thetaStream.live_stream.video_urls[1].url
+            addToMyList(xStreamTitle,xStreamFormat,xStreamLogo,xStreamURL)
+            'addToMyList(thetaStream.live_stream.title, "hls", thetaStream.live_stream.thumbnail_url, thetaStream.live_stream.video_url_map.2d.master)
+
+        End For
+
+
+
+        if m.array.count() = 1
+            m.BottomBar.visible = false
+            m.Video.setFocus(true)
+        end if
+
+				'array = loadConfig()
+			    oneRow = GetApiArray(m.array)
+			    list = [
+			        {
+			            Title:"My Channels"
+			            ContentList : oneRow
+			        }
+			    ]
+			    m.top.content = ParseXMLContent(list)
+			End Sub
+
+      Function addToMyList(xStreamTitle as String,xStreamFormat as String,xStreamLogo as String,xStreamURL as String)
+        currentStreamTemp = { Title: xStreamTitle, streamFormat: "hls", Logo: xStreamLogo, Stream: xStreamURL }
+        print currentStreamTemp
+        m.array.push(currentStreamTemp)
+      End Function
+
+			Function ParseXMLContent(list As Object)
+			    RowItems = createObject("RoSGNode","ContentNode")
+
+			    for each rowAA in list
+			        row = createObject("RoSGNode","ContentNode")
+			        row.Title = rowAA.Title
+
+			        for each itemAA in rowAA.ContentList
+			            item = createObject("RoSGNode","ContentNode")
+			            item.SetFields(itemAA)
+			            row.appendChild(item)
+			        end for
+			        RowItems.appendChild(row)
+			    end for
+
+			    return RowItems
+			End Function
+
+
+			Function GetApiArray(array as Object)
+			    result = []
+			    for each element in array
+			    	item = {}
+			    	item.Title = element.Title
+			    	item.streamFormat = element.streamFormat
+			    	item.HDPosterUrl = element.Logo
+			    	item.Url = element.Stream
+			        result.push(item)
+			    end for
+			    return result
+			End Function
+
+      Function loadTheArray() as Object
+
+
+
+          arr = [
+      '##### Format for inputting stream info #####
+      '## For each channel, enclose in brackets ##
+      '{
+      '   Title: Channel Title
+      '   streamFormat: Channel stream type (ex. "hls", "ism", "mp4", etc..)
+      '   Logo: Channel Logo (ex. "http://Roku.com/Roku.jpg)
+      '   Stream: URL to stream (ex. http://hls.Roku.com/talks/xxx.m3u8)
+      '}
+
+      {
+          Title: "Roku Example Sfsfds"
+          streamFormat: "hls"
+          Logo: "https://placeholdit.imgix.net/~text?txtsize=33&txt=channel+logo&w=267&h=150"
+          Stream: "https://live3-slivertv.akamaized.net/hls/live/2015963/hls_streamer_us_east_0014/usrjartsp1vaq99785v_source/chunklist.m3u8"
+      }
+      {
+          Title: "Roku Example Two"
+          streamFormat: "hls"
+          Logo: "https://placeholdit.imgix.net/~text?txtsize=33&txt=channel+logo&w=267&h=150"
+          Stream: "https://live1-slivertv.akamaized.net/hls/live/2015789/hls_streamer_us_west_0097/playlist.m3u8"
+      }
+      {
+          Title: "Roku Example Three"
+          streamFormat: "mp4"
+          Logo: "https://placeholdit.imgix.net/~text?txtsize=33&txt=channel+logo&w=267&h=150"
+          Stream: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
+      }
+
+
+
+
+      '##### Make sure all Channel content is above this line #####
+          ]
+          return arr
+      End Function
+]]>
+    </script>
+</component>

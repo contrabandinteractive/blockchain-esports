@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+<component name="GetStreams" extends="Task">
+
+    <interface>
+        <field id="content" type="node" />
+        <field id = "HTTPurl" type = "string" />
+    </interface>
+
+    <script type="text/brightscript">
+
+        <![CDATA[
+			Sub Init()
+			    m.top.functionName = "loadContent"
+			End Sub
+
+			Sub loadContent()
+        url = m.top.HTTPurl
+        m.xfer = CreateObject("roURLTransfer")
+        m.xfer.SetCertificatesFile("common:/certs/ca-bundle.crt")
+        m.xfer.SetURL("http://jinn.rocks/apps/theta/test.json")
+        m.rsp = m.xfer.GetToString()
+        'print m.rsp
+        'm.array = loadTheArray()
+        m.global.thetastreams = loadTheArray()
+        'print m.global.thetastreams
+
+        url = "This is a test 123"
+        print url
+			End Sub
+
+			Function ParseXMLContent(list As Object)
+			    RowItems = createObject("RoSGNode","ContentNode")
+
+			    for each rowAA in list
+			        row = createObject("RoSGNode","ContentNode")
+			        row.Title = rowAA.Title
+
+			        for each itemAA in rowAA.ContentList
+			            item = createObject("RoSGNode","ContentNode")
+			            item.SetFields(itemAA)
+			            row.appendChild(item)
+			        end for
+			        RowItems.appendChild(row)
+			    end for
+
+			    return RowItems
+			End Function
+
+
+			Function GetApiArray(array as Object)
+			    result = []
+			    for each element in array
+			    	item = {}
+			    	item.Title = element.Title
+			    	item.streamFormat = element.streamFormat
+			    	item.HDPosterUrl = element.Logo
+			    	item.Url = element.Stream
+			        result.push(item)
+			    end for
+			    return result
+			End Function
+
+      Function loadTheArray() as Object
+
+
+
+          arr = [
+      
+
+      {
+          Title: "Roku Example Sfsfds"
+          streamFormat: "hls"
+          Logo: "https://placeholdit.imgix.net/~text?txtsize=33&txt=channel+logo&w=267&h=150"
+          Stream: "https://live3-slivertv.akamaized.net/hls/live/2015963/hls_streamer_us_east_0014/usrjartsp1vaq99785v_source/chunklist.m3u8"
+      }
+      {
+          Title: "Roku Example Two"
+          streamFormat: "hls"
+          Logo: "https://placeholdit.imgix.net/~text?txtsize=33&txt=channel+logo&w=267&h=150"
+          Stream: "https://live1-slivertv.akamaized.net/hls/live/2015789/hls_streamer_us_west_0097/playlist.m3u8"
+      }
+      {
+          Title: "Roku Example Three"
+          streamFormat: "mp4"
+          Logo: "https://placeholdit.imgix.net/~text?txtsize=33&txt=channel+logo&w=267&h=150"
+          Stream: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
+      }
+      {
+          Title: "Roku Example Four"
+          streamFormat: "mp4"
+          Logo: "https://placeholdit.imgix.net/~text?txtsize=33&txt=channel+logo&w=267&h=150"
+          Stream: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
+      }
+      {
+          Title: "Roku Example Five"
+          streamFormat: "mp4"
+          Logo: "https://placeholdit.imgix.net/~text?txtsize=33&txt=channel+logo&w=267&h=150"
+          Stream: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
+      }
+      {
+          Title: "Roku Example Six"
+          streamFormat: "mp4"
+          Logo: "https://placeholdit.imgix.net/~text?txtsize=33&txt=channel+logo&w=267&h=150"
+          Stream: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
+      }
+
+
+
+      '##### Make sure all Channel content is above this line #####
+          ]
+          return arr
+      End Function
+]]>
+    </script>
+</component>
